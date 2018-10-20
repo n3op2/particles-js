@@ -16,7 +16,7 @@ class Particle {
     this.vel = 2;
     this.maxV = 5;
     this.ctx = ctx
-    this.r = getRnd(4, 1);
+    this.r = getRnd(2.5, 0.1);
     this.f = 1.000873;
     this.a = 0;
     this.dist = 0;
@@ -34,6 +34,10 @@ class Particle {
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI, false);
       ctx.fillStyle = 'rgb(' + this.col.join(',') + ')';
+      ctx.shadowColor = 'black';
+      ctx.shadowBlur = '30';
+      ctx.shadowOffsetX = this.radius;
+      ctx.shadowOffsetY = this.radius;
       ctx.fill();
     }
 
@@ -41,7 +45,8 @@ class Particle {
       // reset all moves
       this.moves.toText = false;
       this.vel = 2;
-      this.radius = getRnd(2, -2);
+      this.r = getRnd(2.5, 0.1)
+      this.radius = getRnd(4, -4);
       this.aStep = 2 * Math.PI / getRnd(560, 40);
     }
 
@@ -55,8 +60,8 @@ class Particle {
       let { dx, dy, dist } = getDist(mx, this.x, my, this.y);
       let ratio;
       if((mx <= this.x + r && mx >= this.x - r) || (my <= this.y + r && my >= this.y - r)) { 
-        if(dist > 1 && !this.moves.toText) {
-          ratio = 1 / dist;
+        if(dist > this.vel && !this.moves.toText) {
+          ratio = this.vel / dist;
           this.x = (ratio * dx) + this.x;
           this.y = (ratio * dy) + this.y;
         }
@@ -72,20 +77,22 @@ class Particle {
           if(this.aStep < 0.5 && this.aStep > 0.01) this.aStep /= this.f
           this.vel *= this.f + 0.006;
           this.ratio = this.vel / this.dist;
-          this.x = (this.ratio * this.dx) + this.x - (this.radius * Math.sin(this.a));
-          this.y = (this.ratio * this.dy) + this.y - (this.radius * Math.cos(this.a));
+          let new_x = (this.ratio * this.dx);
+          let new_y = (this.ratio * this.dy);
+          this.x += new_x - (this.radius * Math.sin(this.a));
+          this.y += new_y - (this.radius * Math.cos(this.a));
         } 
       } else {
-        if(this.aStep < this.aStepMax) this.aStep *= this.f;
-        if(this.radius > -3 && this.radius < 3) { 
+        if(this.aStep < this.aStepMax) this.aStep /= this.f;
+        if(this.radius > -3.5 && this.radius < 3.8) { 
           this.radius *= this.f;
         } else {
-          this.radius /= this.f;
+          this.radius = this.radius;
         }
         this.x += this.radius * Math.sin(this.a);
         this.y += this.radius * Math.cos(this.a);
       }
-      this.a += this.aStep;
+      this.a += this.aStep + 0.009;
     }
   }
 }
