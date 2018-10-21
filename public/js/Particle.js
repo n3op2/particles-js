@@ -13,13 +13,14 @@ class Particle {
     this.dir = Math.random() > 0.5 ? true : false;
     this.ax = x, this.ay = y;
     this.x = x, this.y = y;
-    this.vel = 2;
+    this.vel = 2, this.velMax = 10;
     this.ctx = ctx
     this.r = getRnd(7, 1);
-    this.f = 1.000873;
+    this.f_default = 1.000873;
+    this.f = this.f_default;
     this.a = 0;
-    this.radius = getRnd(2, -2), this.radiusMax = 5.5;
-    this.aStep = angPI(660, 40), this.aStepMax = 2;
+    this.radius = getRnd(2, -2), this.radiusMax = 3.5;
+    this.aStep = angPI(660, 40), this.aStepMax = 1.4;
     this.col = [Math.ceil(getRnd(155, 10)), Math.ceil(getRnd(150, 0)), 20];
     this.moves = {
       toText: false
@@ -41,6 +42,7 @@ class Particle {
       this.moves.toText = false;
       this.vel = 2;
       this.radius = getRnd(1, -1);
+      this.f = this.f_default;
       this.aStep = 2 * Math.PI / getRnd(860, 40);
     }
 
@@ -51,24 +53,33 @@ class Particle {
     }
     
     this.follow = (mx, my, r) => {
+      // Write a new function, return new_x new_y;
       let { dx, dy, dist } = getDist(mx, this.x, my, this.y);
       let ratio;
       if((mx <= this.x + r && mx >= this.x - r) || (my <= this.y + r && my >= this.y - r)) { 
-        if(dist > this.vel  / 4 && !this.moves.toText) {
-          ratio = (this.vel / 4) / dist;
-          this.x = (ratio * dx) + this.x;
-          this.y = (ratio * dy) + this.y;
+        if(dist > this.vel  / 2 && !this.moves.toText) {
+          if(this.vel < this.velMax) this.vel *= this.f;
+          ratio = (this.vel / 2) / dist;
+          let new_x = ratio * dx;
+          let new_y = ratio * dy;
+          this.x += new_x - this.radius * Math.sin(this.a);
+          this.y += new_y - this.radius * Math.cos(this.a);
         }
       }
     }
 
     this.step = () => {
       if(this.moves.toText){
+      // Write a new function, return new_x new_y;
+        // Same Here
         let { dx, dy, dist } = getDist(this.targetX, this.x, this.targetY, this.y);
         let ratio;
         if(dist > this.vel){
-          if(this.aStep < 0.5 && this.aStep > 0.01) this.aStep /= this.vel; 
-          this.vel *= this.f + 0.006;
+          if(this.aStep < this.aStepMax) this.aStep *= this.f;
+          if(this.vel < this.velMax) { 
+            this.vel *= this.f;
+            this.f *= 1.0008;
+          }
           ratio = this.vel / dist;
           let new_x = ratio * dx;
           let new_y = ratio * dy;
@@ -76,12 +87,16 @@ class Particle {
           this.y += new_y - this.radius * Math.cos(this.a);
         } 
       } else {
-        if(this.aStep < this.aStepMax) this.aStep /= this.f;
+        if(this.aStep < this.aStepMax) this.aStep *= this.f;
+        if(this.x < 0 || this.y < 0) this.aStep /= this.f;
         if(this.radius > toNeg(this.radiusMax) && this.radius < this.radiusMax) { 
-          this.radius /= this.f;
+          this.radius *= this.f;
         } else {
-          this.radius = this.radius * 3;
+          this.radius /= 2;
         }
+        
+        // Write a new function, return new_x new_y;
+        // Same Here Change controls in a new js file Controls.js and add to main?
         this.x -= this.radius * Math.sin(this.a) * 1.4;
         this.y -= this.radius * Math.cos(this.a) * 1.2;
       }
