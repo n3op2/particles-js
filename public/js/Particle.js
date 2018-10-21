@@ -31,7 +31,7 @@ class Particle {
       ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI, false);
       ctx.fillStyle = 'rgb(' + this.col.join(',') + ')';
       ctx.shadowColor = 'black';
-      ctx.shadowBlur = '20';
+      ctx.shadowBlur = '4';
       ctx.shadowOffsetX = this.radius;
       ctx.shadowOffsetY = this.radius;
       ctx.fill();
@@ -56,6 +56,9 @@ class Particle {
       // Write a new function, return new_x new_y;
       let { dx, dy, dist } = getDist(mx, this.x, my, this.y);
       let ratio;
+      // To get nice accelaration depending on the distance so 100% - 0 vel | 0 % 100 vel
+      let obj = getDist(this.ax, this.x, this.ay, this.y); 
+      console.log(dist / (obj.dist));
       if((mx <= this.x + r && mx >= this.x - r) || (my <= this.y + r && my >= this.y - r)) { 
         if(dist > this.vel  / 2 && !this.moves.toText) {
           if(this.vel < this.velMax) this.vel *= this.f;

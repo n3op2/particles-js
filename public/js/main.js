@@ -20,8 +20,8 @@ const createParts = (x, y, str) => {
   ctx.textAlign = 'center';
   ctx.fillText(str, x, y);
   const data = ctx.getImageData(0, 0, stage_w, stage_h).data;
-  for(let i = 0; i< stage_w; i += Math.round(stage_w / 350)) {
-    for(let j = 0; j < stage_h; j += Math.round(stage_w / 350)) {
+  for(let i = 0; i< stage_w; i += Math.round(stage_w / 50)) {
+    for(let j = 0; j < stage_h; j += Math.round(stage_w / 50)) {
       if(data[((i + j * stage_w) * 4) + 3] > 250) {
         parts.push(addPart(i, j));
       }
@@ -58,7 +58,10 @@ const inRadius = (x, y, tx, ty, r) => {
     (_mC(x) >= (_mC(tx)-r) && _mC(x) <= (_mC(tx)+r));
 }
 
+//setInterval(() => console.log(parts[0].
+
 const init = () => {
+  clear();
   parts.forEach(el => el.follow(mouse_x, mouse_y, 100));
   parts.forEach((el, i) => {
     if(inRadius(el.x, el.y, mouse_x, mouse_y, 50)) { 
