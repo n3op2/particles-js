@@ -2,18 +2,21 @@ const getRnd = (min, max) => Math.random() * (max - min) + min;
 const toNeg = (n) => -Math.abs(n); 
 const toPos = (n) => Math.abs(n); 
 const angPI = (min_deg, max_deg) => 2 * Math.PI / getRnd(min_deg, max_deg); 
+
+const getDeltas = (x, y, tx, ty) => ({ dx: tx - x, dy: ty - y });
+const getDistance = (dx, dy) => Math.sqrt((dx * dx) + (dy * dy));
+
 const getDist = (tx, x, ty, y) => {
   let dx = tx - x;
   let dy = ty - y;
   return { dx: dx, dy: dy, dist: Math.sqrt((dx * dx) + (dy * dy)) };
 }
 const getDist2 = (x, y, tx, ty) => {
-	let new_x, let new_y;
 	let dx = tx - x; 
 	let dy = ty - y; 
 	let dist = Math.sqrt((dx * dx) + (dy * dy));
 }
-const newCords = (dx, dy, ratio) => { newX: ratio * dx, newY: ratio * dy }
+const newCords = (dx, dy, ratio) => ({ newX: ratio * dx, newY: ratio * dy });
 /*
         let ratio;
         if(dist > this.vel){
@@ -58,9 +61,9 @@ class Particle {
       ctx.fillStyle = 'rgb(' + this.col.join(',') + ')';
       ctx.shadowColor = 'black';
 			// Shadows are very effective but expensive too
-      ctx.shadowBlur = '4';
-      ctx.shadowOffsetX = this.radius;
-      ctx.shadowOffsetY = this.radius;
+      //ctx.shadowBlur = '4';
+      //ctx.shadowOffsetX = this.radius;
+      //ctx.shadowOffsetY = this.radius;
       ctx.fill();
     }
 
@@ -81,16 +84,16 @@ class Particle {
     }
     
     this.follow = (mx, my, r) => {
-      // Write a new function, return new_x new_y;
-      let { dx, dy, dist } = getDist(mx, this.x, my, this.y);
-      let ratio;
       // To get nice accelaration depending on the distance so 100% - 0 vel | 0 % 100 vel
       let obj = getDist(this.ax, this.x, this.ay, this.y); 
-      //console.log(dist / (obj.dist));
+      // Write a new function, return new_x new_y;
+			//let d = getDeltas(this.x, this.y, this.ax, this.ay);
+			//let distance = getDistance(d.dx, d.dy);
+      let { dx, dy, dist } = getDist(mx, this.x, my, this.y);
       if((mx <= this.x + r && mx >= this.x - r) || (my <= this.y + r && my >= this.y - r)) { 
         if(dist > this.vel  / 2 && !this.moves.toText) {
           if(this.vel < this.velMax) this.vel *= this.f;
-          ratio = (this.vel / 2) / dist;
+          let ratio = (this.vel / 2) / dist;
           let new_x = ratio * dx;
           let new_y = ratio * dy;
           this.x += new_x - this.radius * Math.sin(this.a);
@@ -104,33 +107,28 @@ class Particle {
       // Write a new function, return new_x new_y;
         // Same Here
         let { dx, dy, dist } = getDist(this.targetX, this.x, this.targetY, this.y);
-        let ratio;
         if(dist > this.vel){
-          if(this.aStep < this.aStepMax) this.aStep *= this.f;
-          if(this.vel < this.velMax) { 
-            this.vel *= this.f;
-            this.f *= 1.0008;
-          }
-          ratio = this.vel / dist;
+          if(this.vel < this.velMax) this.f *= 1.0008;
+          let ratio = this.vel / dist;
           let new_x = ratio * dx;
           let new_y = ratio * dy;
           this.x += new_x - this.radius * Math.sin(this.a);
           this.y += new_y - this.radius * Math.cos(this.a);
         } 
       } else {
-        if(this.aStep < this.aStepMax) this.aStep *= this.f;
         if(this.x < 0 || this.y < 0) this.aStep /= this.f;
         if(this.radius > toNeg(this.radiusMax) && this.radius < this.radiusMax) { 
           this.radius *= this.f;
         } else {
           this.radius /= 2;
         }
-        
         // Write a new function, return new_x new_y;
         // Same Here Change controls in a new js file Controls.js and add to main?
         this.x -= this.radius * Math.sin(this.a) * 1.4;
         this.y -= this.radius * Math.cos(this.a) * 1.2;
       }
+      this.aStep < this.aStepMax ? this.aStep *= this.f : this.aStep /= 2;
+     	this.vel < this.velMax ? this.vel *= this.f : this.vel /= 2;
       this.dir ? this.a += this.aStep : this.a -= this.aStep;
     }
   }
