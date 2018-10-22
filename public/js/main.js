@@ -20,8 +20,8 @@ const createParts = (x, y, str) => {
   ctx.textAlign = 'center';
   ctx.fillText(str, x, y);
   const data = ctx.getImageData(0, 0, stage_w, stage_h).data;
-  for(let i = 0; i< stage_w; i += Math.round(stage_w / 50)) {
-    for(let j = 0; j < stage_h; j += Math.round(stage_w / 50)) {
+  for(let i = 0; i< stage_w; i += Math.round(stage_w / 250)) {
+    for(let j = 0; j < stage_h; j += Math.round(stage_w / 250)) {
       if(data[((i + j * stage_w) * 4) + 3] > 250) {
         parts.push(addPart(i, j));
       }
@@ -52,7 +52,6 @@ const removeLost = (parts) => {
 }
 
 const _mC = (n) => Math.ceil(n);
-
 const inRadius = (x, y, tx, ty, r) => {
     return (_mC(y) >= (_mC(ty)-r) && _mC(y) <= (_mC(ty)+r)) && 
     (_mC(x) >= (_mC(tx)-r) && _mC(x) <= (_mC(tx)+r));
@@ -62,23 +61,25 @@ const inRadius = (x, y, tx, ty, r) => {
 
 const init = () => {
   clear();
-  parts.forEach(el => el.follow(mouse_x, mouse_y, 100));
   parts.forEach((el, i) => {
-    if(inRadius(el.x, el.y, mouse_x, mouse_y, 50)) { 
+    el.draw(); 
+    if(inRadius(el.x, el.y, mouse_x, mouse_y, el.f_range) && !el.moves.toText) { 
+			// Step and follow needs reviewing...
+			el.follow(mouse_x, mouse_y, el.f_range);
       el.col[0] += 10;
       el.col[2] -= 15;
       el.col[1] += 10; 
-    }
-
-    inRadius(el.x, el.y, el.ax, el.ay, 50) ? 
-      (el.col[2] -= 14, el.col[1] += 5, el.col[0] -= 10) :
-      (el.col[2] += 12, el.col[1] -= _mC(getRnd(13, 1))); 
+    } else {
+			el.step();
+		}
+    inRadius(el.x, el.y, el.ax, el.ay, 100) ? 
+      (el.col[2] -= 14, el.col[1] += _mC(Math.random() * 12), el.col[0] -= 1) :
+      (el.col[2] += 12, el.col[1] -= _mC(Math.random() * 12)); 
     if(i % 50 === 0 && el.moves.toText) el.moves.toText = false;
-      return (el.draw(), el.step())
   });
   //removeLost(parts);
   window.requestAnimationFrame(init);   
 }
 
-createParts(800, 500, 'Go Go Ebay!');
+createParts(800, 500, 'LEON IS AWSOME!');
 init();

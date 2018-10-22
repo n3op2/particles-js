@@ -2,16 +2,42 @@ const getRnd = (min, max) => Math.random() * (max - min) + min;
 const toNeg = (n) => -Math.abs(n); 
 const toPos = (n) => Math.abs(n); 
 const angPI = (min_deg, max_deg) => 2 * Math.PI / getRnd(min_deg, max_deg); 
-const getDist = (t_x, x, t_y, y) => {
-  let dx = t_x - x;
-  let dy = t_y - y;
+const getDist = (tx, x, ty, y) => {
+  let dx = tx - x;
+  let dy = ty - y;
   return { dx: dx, dy: dy, dist: Math.sqrt((dx * dx) + (dy * dy)) };
 }
+const getDist2 = (x, y, tx, ty) => {
+	let new_x, let new_y;
+	let dx = tx - x; 
+	let dy = ty - y; 
+	let dist = Math.sqrt((dx * dx) + (dy * dy));
+}
+const newCords = (dx, dy, ratio) => { newX: ratio * dx, newY: ratio * dy }
+/*
+        let ratio;
+        if(dist > this.vel){
+          if(this.aStep < this.aStepMax) this.aStep *= this.f;
+          if(this.vel < this.velMax) { 
+            this.vel *= this.f;
+            this.f *= 1.0008;
+          }
+          ratio = this.vel / dist;
+          let new_x = ratio * dx;
+          let new_y = ratio * dy;
+          this.x += new_x - this.radius * Math.sin(this.a);
+          this.y += new_y - this.radius * Math.cos(this.a);
+        } 
+      } else {
+        if(this.aStep < this.aStepMax) this.aStep *= this.f;
+*/
 
 class Particle {
   constructor(x, y, ctx) {
+		//To go through all of them
     this.dir = Math.random() > 0.5 ? true : false;
     this.ax = x, this.ay = y;
+		this.f_range = getRnd(150, 25);
     this.x = x, this.y = y;
     this.vel = 2, this.velMax = 10;
     this.ctx = ctx
@@ -31,6 +57,7 @@ class Particle {
       ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI, false);
       ctx.fillStyle = 'rgb(' + this.col.join(',') + ')';
       ctx.shadowColor = 'black';
+			// Shadows are very effective but expensive too
       ctx.shadowBlur = '4';
       ctx.shadowOffsetX = this.radius;
       ctx.shadowOffsetY = this.radius;
@@ -47,6 +74,7 @@ class Particle {
     }
 
     this.sendTo = (x, y) => {
+			//Again this is something that I should review and find a better way.
       this.targetX = x;
       this.targetY = y;
       this.moves.toText = true;
@@ -58,7 +86,7 @@ class Particle {
       let ratio;
       // To get nice accelaration depending on the distance so 100% - 0 vel | 0 % 100 vel
       let obj = getDist(this.ax, this.x, this.ay, this.y); 
-      console.log(dist / (obj.dist));
+      //console.log(dist / (obj.dist));
       if((mx <= this.x + r && mx >= this.x - r) || (my <= this.y + r && my >= this.y - r)) { 
         if(dist > this.vel  / 2 && !this.moves.toText) {
           if(this.vel < this.velMax) this.vel *= this.f;
