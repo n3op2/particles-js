@@ -63,12 +63,13 @@ const init = () => {
   clear();
   parts.forEach((el, i) => {
     el.draw(); 
-    if(inRadius(el.x, el.y, mouse_x, mouse_y, el.f_range) && !el.moves.toText) { 
+    if(inRadius(el.x, el.y, mouse_x, mouse_y, 100) && !el.moves.toText) { 
+	    el.follow(mouse_x, mouse_y, 100);
 			// Step and follow needs reviewing...
-			el.follow(mouse_x, mouse_y, el.f_range);
       el.col[0] += 10;
       el.col[2] -= 15;
       el.col[1] += 10; 
+      el.draw();
     } else {
 			el.step();
 		}
