@@ -19,6 +19,7 @@ const createParts = (x, y, str) => {
   ctx.font = 'bold 120px arial';
   ctx.textAlign = 'center';
   ctx.fillText(str, x, y);
+
   const data = ctx.getImageData(0, 0, stage_w, stage_h).data;
   for(let i = 0; i< stage_w; i += Math.round(stage_w / 250)) {
     for(let j = 0; j < stage_h; j += Math.round(stage_w / 250)) {
@@ -73,6 +74,7 @@ const init = () => {
     } else {
 			el.step();
 		}
+
     inRadius(el.x, el.y, el.ax, el.ay, 100) ? 
       (el.col[2] -= 14, el.col[1] += _mC(Math.random() * 12), el.col[0] -= 1) :
       (el.col[2] += 12, el.col[1] -= _mC(Math.random() * 12)); 
